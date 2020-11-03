@@ -4,7 +4,6 @@
 
 """
 Bot to reply to Telegram messages.
-
 Manage follow engagement processes
 Checking conditions from user before post on engagement group
 Interact to telegram API to get latest link as requirement for comming up posts
@@ -14,7 +13,6 @@ import logging
 from telethon.tl.types import BotInlineResult
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
-from get_mess import get_mes
 from telegram.bot import *
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 import telegram.message
@@ -28,9 +26,7 @@ TOKEN = '1098222229:AAE27CLsIN1xPwoDcjrBbz-z34lualgzbB4'
 GROUP = '@follownetwork30'
 FILE = 'user.txt'
 GROUP_TYPE = 'Dx30'
-
-
-#auto_delete_message('1098222229') #delete warning from bot
+SOURCE = 'https://www.instagram.com/'
 
 def get_links_from_file(get_username=False):
     try:
@@ -65,23 +61,25 @@ ad='🔥 Get more likes & comments by joining our other groups👇 \n \
 ❤️Happy engaging❤️ \n \
 🚀Viral Network🚀'
 
-keyboard = [[InlineKeyboardButton("✅   Rules   ✅", url='https://t.me/hoai97nambot', callback_data='1'),
+keyboard = [[InlineKeyboardButton("🔥   Rules   🔥", url='https://t.me/viralnetworkchannel', callback_data='1'),
                  InlineKeyboardButton("📄   List    📄", url='https://t.me/hoai97nambot',callback_data='2')],
 
                 [InlineKeyboardButton("💎   Premium User    💎", url='https://t.me/johntendo', callback_data='3')]]
 
 reply_markup = InlineKeyboardMarkup(keyboard)
 
-list_markup = [[InlineKeyboardButton("🚀 Dx30 Follow chain 🚀", url='https://t.me/follownetwork30')]]
+list_markup = [[InlineKeyboardButton("🚀 Dx30 Follow Group 🚀", url='https://t.me/follownetwork30')]]
 reply_markup1 = InlineKeyboardMarkup(list_markup)
 # Define a few command handlers. These usually take the two arguments update and
 # context. Error handlers also receive the raised TelegramError object in error.
 def start(update, context):
     """Send a message when the command /start is issued."""
-    m=''
+    m='📋 Profiles List 📋 \n Follow the following users to join the list\n'
     k=get_list()
     for i in k:
         m=m+ '\n'+i
+    m=m+'\n\n ➖➖➖➖➖➖➖➖➖➖\nWhen you’re done, drop your instagram profile in this format:\n\
+        Example: dx30 taylorswift or Dx30 taylorswift'
     send_to_destination(update.message.from_user.id, m)
     auto_delete_message(update.message.message_id)    
 
@@ -94,16 +92,14 @@ def help_command(update, context):
     time.sleep(3)
     auto_delete_message(update.message.message_id)
 
-#===========================================================================================
-
 #==========================================================================================
 def echo(update, context): # important info in this function
     """Echo the user message."""
-    aa=update.message.text # get typed link
+    aa=update.message.text # get typed link ⚠️
    
     if aa[:4] == 'dx30' or aa[:4] == 'Dx30':
         # check bunch of of conditions
-        if get_and_extract() and check_profile_link(aa) and check_repost(aa[31:]):
+        if get_and_extract() and check_profile(aa[5:]) and check_repost(aa[5:]):
             tele_usr='@'+ update.message.from_user.username
             bot_push_message(aa,tele_usr)
             # tidy user's message
@@ -111,18 +107,18 @@ def echo(update, context): # important info in this function
             auto_delete_message(update.message.message_id)
         else:
             update.message.reply_text('Please check following reasons: \
-                ✅ No enough follow \n \
-                ✅ Input link with non-exist profile \n \
-                ✅ Wrong syntax',reply_markup=reply_markup1)
+                ❗️ No enough follow \n \
+                ❗️ Input link with non-exist profile \n \
+                ❗️ Wrong syntax',reply_markup=reply_markup1)
             auto_delete_message(update.message.message_id)
             time.sleep(5)
             auto_delete_message(update.message.message_id+1)
     # auto drop functions
-    elif check_profile_link(aa) and aa[:4]=='drop' and check_repost(aa[31:]):
-        bot_push_message(aa,'Auto Drop')   
+    elif check_profile(aa[5:]) and aa[:4]=='drop' and check_repost(aa[5:]):
+        bot_push_message(aa,'@'+update.message.from_user.username,auto_drop=True)   
         auto_delete_message(update.message.message_id)     
     else:
-        update.message.reply_text('Wrong syntax !!!\n Please check again or read our rules',reply_markup=reply_markup1) 
+        update.message.reply_text('Wrong syntax ❗️❗️❗️ \n Please check again or read our rules',reply_markup=reply_markup1) 
         auto_delete_message(update.message.message_id)
         time.sleep(3)
         auto_delete_message(update.message.message_id+1)
@@ -137,13 +133,16 @@ def auto_send_message(st):
     obj=Bot(token=TOKEN)
     obj.send_message(GROUP,st,parse_mode='Markdown',disable_web_page_preview=True,reply_markup=reply_markup)
 
-def bot_push_message(link, user):
+def bot_push_message(link, user,auto_drop=False):
     #trim input link
-    if link[-1] =='/':
-        link=link[:-1]
     obj=Bot(token=TOKEN)
-    sub_link = link[link.find('com/')+4:]
-    me='👤 '+user+ ' ✅ '+' Dx30 [{}]({})'.format(sub_link,link[5:])
+    sub_link = link[5:]
+    link = 'https://www.instagram.com/' + sub_link
+    if auto_drop == True:
+        # auto drop
+        me='🌟 '+user+ ' ✅ '+' Dx30 [{}]({})'.format(sub_link,link)
+    else: 
+        me='👤 '+user+ ' ✅ '+' Dx30 [{}]({})'.format(sub_link,link)
     print(me)
     obj.send_message(GROUP,me, parse_mode='Markdown',disable_web_page_preview=True,reply_markup=reply_markup)
 # this scripts used for testing 👤entrepreneurs_club01 ✅
@@ -174,12 +173,6 @@ def check_repost(usrname_in_repost_link):
     if usrname_in_repost_link in sample:
         return 0
     return 1
-
-def check_profile_link(link):
-    # check valid instagram url from user
-    if link.find('https://www.instagram.com/') and check_profile(link[31:]):
-        return 1
-    return 0
 
 def send_notify(content,mess_id):
     obj=Bot(token=TOKEN)
