@@ -18,11 +18,11 @@ for dialog in client.iter_dialogs():
 ##    print(dialog.name, 'has ID', dialog.id)
 # get message and extract from other groups
 '''
-
+GROUP='Dx30 FOLLOW Viral Network'
 def get_mes():   
     client.connect()
     mess=[]
-    for message in client.iter_messages('Testbot2',10,filter=InputMessagesFilterUrl):
+    for message in client.iter_messages(GROUP,10,filter=InputMessagesFilterUrl):
         m=[]
         #print(message.text.split(" ")[-1])
         tmp=message.text.split(" ")[-1]
